@@ -4,7 +4,7 @@ A DeepSeek Harness plugin that shows how many times the current session's
 context has been compacted, next to the context meter under the composer.
 
 ```
-4 turns 432 steps · 168 tok/s   74.3M tok · Cache hit 95%   30%   Compacted 1×
+4 turns 432 steps · 168 tok/s   74.3M tok · Cache hit 95%   30%   Compactions: 1
 ```
 
 ## What it counts
@@ -74,6 +74,19 @@ npm run check
 `tests/projection.test.mjs` covers the fold in isolation. `tests/host-integration.test.mjs`
 runs the unit against the real `@deepseek-ai/dsh-session` and
 `@deepseek-ai/dsh-session-projection` packages, including the fork case.
+
+### zod
+
+The plugin's own `zod` dependency is floored at `^4.6.6`, the first release
+carrying the fix for CVE-2023-54404 (uncontrolled resource consumption
+through unbounded array validation). The plugin validates numbers and objects
+only, so the vulnerable array path is not reachable here, but the floor keeps
+a patched version in every install.
+
+The `overrides` entry pins the same version for the transitive copies the DSH
+development dependencies bring in, so the whole tree resolves to one patched
+`zod`. It applies to this package's own install only; the DSH packages keep
+their own `zod` pins.
 
 ## License
 

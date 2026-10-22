@@ -20,7 +20,7 @@ window.__ModuleLoader__.load({
 
     const COPY = {
       en: {
-        text: count => `Compacted ${count}×`,
+        text: count => `Compactions: ${count}`,
         title: count =>
           `This session completed ${count} context compaction${count === 1 ? '' : 's'}.`,
       },
