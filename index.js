@@ -16,14 +16,16 @@ import { z } from 'zod'
  * the compactions this session performed.
  */
 
+const countSchema = z.number().int().nonnegative()
+
 const stateSchema = z.object({
-  count: z.number().int().nonnegative(),
+  count: countSchema,
   /** Seq of the fork-inherited prefix; compactions below it belong to the parent. */
   floor: z.number().int(),
 }).strict()
 
 const viewSchema = z.object({
-  count: z.number().int().nonnegative(),
+  count: countSchema,
 }).strict()
 
 /**

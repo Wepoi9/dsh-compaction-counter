@@ -7,17 +7,13 @@ window.__ModuleLoader__.load({
     const SLOT = 'conversation.composer.dock'
 
     /**
-     * The dock is a centered flex row. The shipped activity pill (order 0) and
-     * usage pill (order 1) occupy the platform's own list order, and the
-     * platform renders the standard context ring after the whole slot, so a
-     * slot entry alone always lands LEFT of the ring.
-     *
-     * The slot order therefore cannot place this reading on the ring's right,
-     * which is where it belongs. CSS `order` on the flex items does: the ring
-     * carries no `order` (the default 0), so this entry's `order: 1` moves it
-     * past the ring while the pills keep theirs. Visual order then differs
-     * from DOM order, which is the intended trade for a non-interactive
-     * reading.
+     * The dock is a centered flex row: the shipped activity and usage pills
+     * (list order 0 and 1) render before the standard context ring, so this
+     * entry's list order alone lands it to the ring's left. The entry also
+     * sets CSS `order: 1` on its element: the ring carries the default order
+     * 0, so the reading moves past the ring while the pills keep theirs.
+     * Visual order then differs from DOM order — the accepted trade for a
+     * non-interactive reading.
      */
     const ORDER = 2
     const CSS_ORDER = 1
@@ -77,7 +73,7 @@ window.__ModuleLoader__.load({
             lineHeight: 'calc(20px + var(--dsh-content-font-delta-secondary, 0px))',
           },
         },
-        STRINGS.text(count)
+        STRINGS.text(count),
       )
     }
 
@@ -92,7 +88,7 @@ window.__ModuleLoader__.load({
               id: 'compaction-count',
               order: ORDER,
             },
-            CompactionCountBadge
+            CompactionCountBadge,
           )
         )
       },

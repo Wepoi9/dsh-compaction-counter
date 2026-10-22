@@ -4,7 +4,7 @@ A DeepSeek Harness plugin that shows how many times the current session's
 context has been compacted, next to the context meter under the composer.
 
 ```
-4 turns 432 steps · 168 tok/s   74.3M tok · Cache hit 95%   Compacted 1×   30%
+4 turns 432 steps · 168 tok/s   74.3M tok · Cache hit 95%   30%   Compacted 1×
 ```
 
 ## What it counts
