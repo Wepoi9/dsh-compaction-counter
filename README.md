@@ -1,0 +1,71 @@
+# dsh-compaction-counter
+
+A DeepSeek Harness plugin that shows how many times the current session's
+context has been compacted, next to the context meter under the composer.
+
+```
+4 turns 432 steps · 168 tok/s   74.3M tok · Cache hit 95%   Compacted 1×   30%
+```
+
+## What it counts
+
+One count per **successful** compaction of the current session.
+
+| Event | Counted | Why |
+|---|---|---|
+| `compaction/summary` | yes | Appended inside the synchronous commit step, together with the replacement body, so a failed attempt closes with `compaction/end` carrying an `error` and never produces a summary. |
+| `compaction/end` with `error` | no | A failed attempt records the error and no summary. |
+| `compaction/prune` | no | A tool-result prune is not a compaction of the conversation. |
+| inherited prefix of a forked session | no | Those compactions belong to the parent session, not the fork. |
+
+The count is a durable session projection, so it survives a reload and a
+reopened session: the host recomputes it from the session log.
+
+## Install
+
+From a local checkout:
+
+```sh
+dsh plugin --profile web add "link:<absolute path to this directory>"
+```
+
+The plugin ships its own bundle patch, so the installation appends it to the
+profile's `dsh.profile.bundles` selection. Restart `dsh web` afterwards, then
+hard-refresh the browser.
+
+The plugin does not touch the compaction behavior, the compaction
+configuration, or the platform bundle: it adds one projection unit and one
+composer-dock entry.
+
+## How it works
+
+**Host half** (`index.js`) registers one projection unit, `compactionCount`,
+on `ctx.sessionProjections`. The unit is a pure fold over the committed
+session events; the client receives its whole value through the standard
+projection channel.
+
+**Client half** (`client.js`) registers one entry into the platform's
+`conversation.composer.dock` slot — the same official slot the shipped
+activity and usage pills use. The entry reads the `compactionCount` projection
+through the session standard `useProjection` seat, so it renders nothing when
+the host half is not mounted.
+
+The copy follows the browser's language preference, picked once at load
+(Chinese for a `zh` primary subtag, English otherwise). It does not consult
+the DSH Language setting, and a language change takes effect on reload.
+
+## Development
+
+```sh
+npm install
+npm test    # unit and host-integration tests
+npm run check
+```
+
+`tests/projection.test.mjs` covers the fold in isolation. `tests/host-integration.test.mjs`
+runs the unit against the real `@deepseek-ai/dsh-session` and
+`@deepseek-ai/dsh-session-projection` packages, including the fork case.
+
+## License
+
+MIT
