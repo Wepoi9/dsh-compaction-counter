@@ -7,12 +7,20 @@ window.__ModuleLoader__.load({
     const SLOT = 'conversation.composer.dock'
 
     /**
-     * The dock is a centered flex row: the shipped activity pill (order 0) and
-     * usage pill (order 1) sit left of the context meter, and later entries
-     * follow. This entry takes order 2, so the reading lands between the usage
-     * pill and the context ring.
+     * The dock is a centered flex row. The shipped activity pill (order 0) and
+     * usage pill (order 1) occupy the platform's own list order, and the
+     * platform renders the standard context ring after the whole slot, so a
+     * slot entry alone always lands LEFT of the ring.
+     *
+     * The slot order therefore cannot place this reading on the ring's right,
+     * which is where it belongs. CSS `order` on the flex items does: the ring
+     * carries no `order` (the default 0), so this entry's `order: 1` moves it
+     * past the ring while the pills keep theirs. Visual order then differs
+     * from DOM order, which is the intended trade for a non-interactive
+     * reading.
      */
     const ORDER = 2
+    const CSS_ORDER = 1
 
     const COPY = {
       en: {
@@ -59,6 +67,7 @@ window.__ModuleLoader__.load({
           'data-compaction-count': count,
           title: STRINGS.title(count),
           style: {
+            order: CSS_ORDER,
             display: 'inline-flex',
             alignItems: 'center',
             whiteSpace: 'nowrap',

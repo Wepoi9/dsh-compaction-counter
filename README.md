@@ -50,6 +50,15 @@ activity and usage pills use. The entry reads the `compactionCount` projection
 through the session standard `useProjection` seat, so it renders nothing when
 the host half is not mounted.
 
+**Placement.** The platform renders the whole dock slot before the standard
+context ring, so a slot entry's own `order` cannot place the reading on the
+ring's right — it always lands to the ring's left. The entry therefore also
+sets the CSS `order: 1` on its own element. The dock is a flex row whose
+standard ring carries no `order` (the default 0), so this moves the reading
+past the ring while the shipped pills keep theirs. The visual order then
+differs from the DOM order, which is the accepted trade for a reading that is
+not interactive.
+
 The copy follows the browser's language preference, picked once at load
 (Chinese for a `zh` primary subtag, English otherwise). It does not consult
 the DSH Language setting, and a language change takes effect on reload.
