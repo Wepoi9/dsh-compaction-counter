@@ -3,13 +3,13 @@ import test from 'node:test'
 import { Context } from '@deepseek-ai/cordis'
 import SessionStore, { SessionId, SessionLogOffset, SessionSeq } from '@deepseek-ai/dsh-session'
 import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
-import { compactionCountDefinition } from '../index.js'
+import { apply, compactionCountDefinition, inject, name } from '../index.js'
 
-test('the unit drives over a real session log', async () => {
+test('the async plugin registration drives over a real session log', async () => {
   const ctx = new Context()
   await ctx.plugin(SessionStore)
   await ctx.plugin(SessionProjectionRegistry)
-  ctx.sessionProjections.register(compactionCountDefinition)
+  await ctx.plugin({ name, inject, apply })
 
   const session = ctx.sessions.create(SessionId('compaction-count-host'))
   session.append('turn/start', { turn: 1 })
@@ -35,7 +35,7 @@ test('a forked session counts only its own compactions', async () => {
   const ctx = new Context()
   await ctx.plugin(SessionStore)
   await ctx.plugin(SessionProjectionRegistry)
-  ctx.sessionProjections.register(compactionCountDefinition)
+  const handle = await ctx.sessionProjections.register(compactionCountDefinition)
 
   const parent = ctx.sessions.create(SessionId('compaction-count-parent'))
   parent.append('compaction/summary', {
@@ -48,8 +48,8 @@ test('a forked session counts only its own compactions', async () => {
     model: 'test',
   })
   const child = ctx.sessions.fork(parent)
-  assert.equal(ctx.sessionProjections.stateOf(parent, 'compactionCount').count, 1)
-  assert.equal(ctx.sessionProjections.stateOf(child, 'compactionCount').count, 0)
+  assert.equal(handle.stateOf(parent).count, 1)
+  assert.equal(handle.stateOf(child).count, 0)
   assert.equal(child.inheritedEventCount, SessionLogOffset(parent.seq))
   await ctx.fiber.dispose()
 })

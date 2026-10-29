@@ -74,8 +74,13 @@ export const inject = ['sessionProjections']
 /**
  * Register the compaction-count unit.
  *
+ * Registration may perform asynchronous work, so the plugin awaits the ready
+ * handle before the composition publishes consumers. The returned value is a
+ * callable thenable; the plugin must neither return nor yield it.
+ *
  * @param {object} ctx - the host cordis context.
+ * @returns the completion of registration.
  */
-export function apply(ctx) {
-  ctx.sessionProjections.register(compactionCountDefinition)
+export async function apply(ctx) {
+  await ctx.sessionProjections.register(compactionCountDefinition)
 }
