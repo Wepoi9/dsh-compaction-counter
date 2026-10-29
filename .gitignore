@@ -1,2 +1,8 @@
 node_modules/
 npm-debug.log*
+.env
+.env.*
+.npmrc
+*.log
+*.local
+.DS_Store
